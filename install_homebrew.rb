@@ -34,9 +34,9 @@ end
 
 def sudo *args
   args = if args.length > 1
-    args.unshift "sudo"
+    args.unshift "/usr/bin/sudo"
   else
-    "sudo #{args.first}"
+    "/usr/bin/sudo #{args.first}"
   end
   ohai *args
   system *args
@@ -70,9 +70,9 @@ This script requires the user #{ENV['USER']} to be in the staff group. If this
 sucks for you then you can install Homebrew in your home directory or however
 you please; please refer to the website. If you still want to use this script
 the following command should work (under Tiger):
-
+    
     sudo dscl . append /Groups/staff GroupMembership $USER
-
+  
 You may also chown -Rf the target directory.
 EOABORT
 
@@ -89,7 +89,7 @@ root_dirs = []
 %w(bin Cellar etc include lib Library sbin share var .git).each do |d|
   d = "/usr/local/#{d}"
   if File.directory? d then chmods else root_dirs end << d
-end
+end 
 chmods = chmods.select{ |d| File.directory? d and not File.writable? d }
 chgrps = chmods.reject{ |d| File.stat(d).grpowned? }
 
@@ -108,13 +108,13 @@ if STDIN.tty?
   puts "Press enter to continue"
   abort unless getc == 13
 end
-
-sudo "mkdir /usr/local" unless File.directory? "/usr/local"
-sudo "chmod o+w /usr/local"
+  
+sudo "/bin/mkdir /usr/local" unless File.directory? "/usr/local"
+sudo "/bin/chmod o+w /usr/local"
 begin
-  sudo "chmod", "g+w", *chmods unless chmods.empty?
-  sudo "chgrp", "staff", *chgrps unless chgrps.empty?
-  system "mkdir", *root_dirs unless root_dirs.empty?
+  sudo "/bin/chmod", "g+w", *chmods unless chmods.empty?
+  sudo "/usr/bin/chgrp", "staff", *chgrps unless chgrps.empty?
+  system "/bin/mkdir", *root_dirs unless root_dirs.empty?
 
   Dir.chdir "/usr/local" do
     ohai "Downloading and Installing Homebrew..."
@@ -122,9 +122,16 @@ begin
     # pipefail to cause the exit status from curl to propogate if it fails
     # REMOVED pipefail option (not available on Tiger PPC).
     # REMOVED SSL security, using curl option '-k' (certificate can't be checked due to too old curl-ca.cert).
+    system "/bin/bash -c '/usr/bin/curl -sSfLk https://github.com/gbock72/tigerbrew/tree/patch-1 | /usr/bin/tar -xz -m --strip 1'"
     #system "bash -c 'curl -vsSfLk https://github.com/gbock72/tigerbrew/tree/patch-1 | tar -xzv'"
     #system "bash -c 'wget -c https://github.com/gbock72/tigerbrew/tree/patch-1/ && tar -zcf  tigerbrew.tar.gz /tigerbrew'"
-    system "bash -c 'wget -r -np https://github.com/gbock72/tigerbrew/tree/patch-1/'"
+    #system "bash -c 'wget -r -np https://github.com/gbock72/tigerbrew/tree/patch-1/'" 
+    #system "bash -c 'curl https://github.com/gbock72/tigerbrew/tree/patch-1/tigerbrew.tar.gz | tar -xz'"
+	  #system "bash -c 'curl https://github.com/gbock72/tigerbrew/tree/patch-1/ | sudo tar -xz  -C /usr/local/'"		 
+		#system "bash -c 'wget -r -np https://github.com/gbock72/tigerbrew/tree/patch-1/'"
+    #system "bash -c 'wget -i 'https://github.com/gbock72/tigerbrew/tree/patch-1' -O tigerbrew-master.zip'"						  
+	  #system "bash -c 'wget -c https://github.com/gbock72/tigerbrew/tree/patch-1/tigerbrew.tar.gz -O - | tar -xz'"
+		#system "bash -c 'wget -c https://github.com/gbock72/tigerbrew/tree/patch-1/ && tar -zcf  tigerbrew.tar.gz /tigerbrew'"    
   end
 ensure
   # we reset the permissions of /usr/local because we want to minimise the
