@@ -37,7 +37,7 @@ Run these commands from your terminal. You must have git installed.
 
 ```
 cd `brew --repository`
-git remote set-url origin https://github.com/mistydemeo/tigerbrew.git
+git remote set-url origin https://github.com/gbock72/tigerbrew.git
 git fetch origin
 git reset --hard origin/master
 ```
