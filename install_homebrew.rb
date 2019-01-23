@@ -1,6 +1,6 @@
-#!/usr/bin/ruby
+#!ruby
 # This script installs to /usr/local only. To install elsewhere you can just
-# untar https://github.com/mistydemeo/tigerbrew anywhere you like.
+# untar https://github.com/gbock72/tigerbrew/tree/patch-1 anywhere you like.
 
 module Tty extend self
   def blue; bold 34; end
@@ -34,9 +34,9 @@ end
 
 def sudo *args
   args = if args.length > 1
-    args.unshift "/usr/bin/sudo"
+    args.unshift "sudo"
   else
-    "/usr/bin/sudo #{args.first}"
+    "sudo #{args.first}"
   end
   ohai *args
   system *args
@@ -109,12 +109,12 @@ if STDIN.tty?
   abort unless getc == 13
 end
 
-sudo "/bin/mkdir /usr/local" unless File.directory? "/usr/local"
-sudo "/bin/chmod o+w /usr/local"
+sudo "mkdir /usr/local" unless File.directory? "/usr/local"
+sudo "chmod o+w /usr/local"
 begin
-  sudo "/bin/chmod", "g+w", *chmods unless chmods.empty?
-  sudo "/usr/bin/chgrp", "staff", *chgrps unless chgrps.empty?
-  system "/bin/mkdir", *root_dirs unless root_dirs.empty?
+  sudo "chmod", "g+w", *chmods unless chmods.empty?
+  sudo "chgrp", "staff", *chgrps unless chgrps.empty?
+  system "mkdir", *root_dirs unless root_dirs.empty?
 
   Dir.chdir "/usr/local" do
     ohai "Downloading and Installing Homebrew..."
@@ -122,13 +122,13 @@ begin
     # pipefail to cause the exit status from curl to propogate if it fails
     # REMOVED pipefail option (not available on Tiger PPC).
     # REMOVED SSL security, using curl option '-k' (certificate can't be checked due to too old curl-ca.cert).
-    system "/bin/bash -c '/usr/bin/curl -sSfLk https://github.com/mistydemeo/tigerbrew | /usr/bin/tar xz -m --strip 1'"
+    system "bash -c 'curl -vfLk https://github.com/gbock72/tigerbrew/tree/patch-1 | tar -xv xz -dv'"
   end
 ensure
   # we reset the permissions of /usr/local because we want to minimise the
   # amount of fiddling we do to the system. Some tools require /usr/local to
   # be by non-writable for non-root users.
-  sudo "/bin/chmod o-w /usr/local"
+  sudo "chmod o-w /usr/local"
 end
 
 warn "/usr/local/bin is not in your PATH." unless ENV['PATH'].split(':').include? '/usr/local/bin'
