@@ -122,7 +122,8 @@ begin
     # pipefail to cause the exit status from curl to propogate if it fails
     # REMOVED pipefail option (not available on Tiger PPC).
     # REMOVED SSL security, using curl option '-k' (certificate can't be checked due to too old curl-ca.cert).
-    system "bash -c 'curl -vfLk https://github.com/gbock72/tigerbrew/tree/patch-1 | tar -xv'"
+    #system "bash -c 'curl -vsSfLk https://github.com/gbock72/tigerbrew/tree/patch-1 | tar -xzv'"
+    system "bash -c 'wget -c https://github.com/gbock72/tigerbrew/tree/patch-1/tigerbrew && tar -zcf  tigerbrew.tar.gz /tigerbrew'"
   end
 ensure
   # we reset the permissions of /usr/local because we want to minimise the
